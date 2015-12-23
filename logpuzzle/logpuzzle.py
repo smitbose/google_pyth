@@ -32,7 +32,9 @@ def read_urls(filename):
   paths = re.findall(r'GET (\S+puzzle\S+) HTTP',content)
   url_list = []
   for path in paths:
-  	url_list.append(hostname+path)
+  	url = hostname+path
+  	if not url in url_list:
+  		url_list.append(url)
   #sys.exit(0)
   return url_list
 
@@ -50,10 +52,14 @@ def download_images(img_urls, dest_dir):
   count = 0
   if not os.path.exists(dest_dir):
   	os.mkdir(dest_dir)
+  f = open(os.path.join(dest_dir,'index.html'),'w')
+  f.write('<verbatim>\n<html>\n<boldy>')
   for url in img_urls:
   	print 'Downloading image '+str(count)+'...'
   	urllib.urlretrieve(url,dest_dir+'/img'+str(count))
+  	f.write('<img src="img%s">'%str(count))
   	count+=1
+  f.write('</body>\n</html>')
   # +++your code here+++
   
 
@@ -70,7 +76,7 @@ def main():
     del args[0:2]
 
   img_urls = read_urls(args[0])
-
+  img_urls.sort()
   if todir:
     download_images(img_urls, todir)
   else:
